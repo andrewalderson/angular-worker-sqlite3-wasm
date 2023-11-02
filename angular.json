@@ -61,7 +61,12 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              {
+                "input": "node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/sqlite3-opfs-async-proxy.js",
+                "inject": false
+              }
+            ],
             "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
