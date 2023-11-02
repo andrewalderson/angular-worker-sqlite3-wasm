@@ -95,18 +95,18 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "angular-worker-sqlite3-wasm:build:production",
               "headers": {
                 "Cross-Origin-Opener-Policy": "same-origin",
                 "Cross-Origin-Embedder-Policy": "require-corp"
-              }
+              },
+              "buildTarget": "angular-worker-sqlite3-wasm:build:production"
             },
             "development": {
-              "browserTarget": "angular-worker-sqlite3-wasm:build:development",
               "headers": {
                 "Cross-Origin-Opener-Policy": "same-origin",
                 "Cross-Origin-Embedder-Policy": "require-corp"
-              }
+              },
+              "buildTarget": "angular-worker-sqlite3-wasm:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -114,7 +114,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angular-worker-sqlite3-wasm:build"
+            "buildTarget": "angular-worker-sqlite3-wasm:build"
           }
         }
       }
