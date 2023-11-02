@@ -4,9 +4,6 @@
 	"name": "Node.js & TypeScript",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-18-bullseye",
-	"features": {
-		"ghcr.io/devcontainers-contrib/features/angular-cli:2": {}
-	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
