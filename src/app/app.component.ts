@@ -1,76 +1,25 @@
-import { Component, OnInit, signal } from '@angular/core';
-import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import coincident from 'coincident';
+
+export type SqliteWorker = { init: () => void}
 
 @Component({
   selector: 'app-root',
-  template: `<h1>Main thread</h1>
-  <pre class=main>{{mainOutput()}}</pre>
-  <h1>Worker</h1>
-  <pre class=worker>{{workerOutput()}}</pre>`,
+  template: ``,
   styles: []
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
-  protected mainOutput = signal('');
-  protected workerOutput = signal('');
-
-  #log = (...args: any[]) => {
-    console.log(...args);
-    this.mainOutput.update(value => value + `${args.join(' ')}\n`);
-  }
-  #error = (...args: any[]) => {
-    console.error(...args);
-    this.mainOutput.update(value => value + `${args.join(' ')}\n`);
-  }
-  
-  #workerLog = (...args: any[]) => {
-    console.log(...args);
-    this.workerOutput.update(value => value + `${args.join(' ')}\n`);
-  }
-  #workerError = (...args: any[]) => {
-    console.error(...args);
-    this.workerOutput.update(value => value + `${args.join(' ')}\n`);
+  #worker!: any // don't like this
+  async ngOnInit() {
+    this.#worker = coincident(new Worker(new URL('sqlite.worker', import.meta.url)))
+    await this.#worker.init();
+    await this.#worker.open('/mydb.sqlite3');
+    const result = await this.#worker.exec();
+    console.log('RESULT: ', result)
   }
 
-  ngOnInit(): void {
-
-    const start = (sqlite3: any) => {
-      this.#log('Running SQLite3 version', sqlite3.version.libVersion);
-      let db;
-      if ('opfs' in sqlite3) {
-        db = new sqlite3.oo1.OpfsDb('/mydb.sqlite3');
-        this.#log('OPFS is available, created persisted database at', db.filename);
-      } else {
-        db = new sqlite3.oo1.DB('/mydb.sqlite3', 'ct');
-        this.#log('OPFS is not available, created transient database', db.filename);
-      }
-      // Your SQLite code here.
-    };
-    
-    this.#log('Loading and initializing SQLite3 module...');
-    sqlite3InitModule({
-      print: this.#log,
-      printErr: this.#error,
-      locateFile: () => '/sqlite3.wasm',
-    }).then((sqlite3) => {
-      this.#log('Done initializing. Running demo...');
-      try {
-        start(sqlite3);
-      } catch (err: any) {
-        this.#error(err.name, err.message);
-      }
-    });
-
-    const worker = new Worker(new URL('./sqlite.worker', import.meta.url));
-
-    worker.onmessage = ({data}) => {
-      switch (data.type) {
-        case 'log':
-          this.#workerLog(data.payload)
-          break;
-        default:
-          this.#workerError(data.payload)
-      }
-    }
+  ngOnDestroy(): void {
+    this.#worker.close();
   }
 }
